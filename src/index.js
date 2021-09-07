@@ -1,17 +1,57 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { request } from 'graphql-request'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const url = 'http://localhost:4000/graphql'
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+let query = `
+  query listUsers {
+    allUsers {
+      avatar
+      name
+      githubLogin
+    }
+  }
+`
+
+let mutation = `
+  mutation populate($count: Int!) {
+    addFakeUsers(count: $count) {
+      githubLogin
+      avatar
+      name
+    }
+  }
+`
+
+const App = ({ users = [] }) => {
+  return(
+    <div>
+      {users.map(user =>
+        <div key={user.githubLogin}>
+          <img src={user.avatar} alt="" />
+          {user.name}
+        </div>
+      )}
+      <button  onClick={addUser}>Add User</button>
+    </div>
+  )
+}
+
+const render = ({ allUsers = [] }) =>
+  ReactDOM.render(
+      <App users={allUsers} />,
+    document.getElementById('root')
+  )
+
+const addUser = () =>
+  request(url, mutation, {count: 1})
+    .then(requestAndRendar)
+    .catch(console.error)
+
+const requestAndRendar = () =>
+  request(url, query)
+    .then(render)
+    .catch(console.error)
+
+requestAndRendar()
