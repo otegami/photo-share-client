@@ -1,3 +1,6 @@
+## 初めてのGraphQL: Webサービスを作って学ぶ新世代API
+https://www.oreilly.co.jp/books/9784873118932/
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
