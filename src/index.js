@@ -1,57 +1,72 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { request } from 'graphql-request'
+import { render } from 'react-dom'
+import App from './App'
+import { ApolloProvider } from 'react-apollo'
+import ApolloClient, { gql } from 'apollo-boost'
 
-const url = 'http://localhost:4000/graphql'
+const client = new ApolloClient({ uri: 'http://localhost:4000/graphql' })
 
-let query = `
-  query listUsers {
-    allUsers {
-      avatar
-      name
-      githubLogin
-    }
-  }
-`
+render(
+  <ApolloProvider client={client}>
+    <App />
+  </ApolloProvider>,
+  document.getElementById('root')
+)
 
-let mutation = `
-  mutation populate($count: Int!) {
-    addFakeUsers(count: $count) {
-      githubLogin
-      avatar
-      name
-    }
-  }
-`
+// const query = gql`
+//   {
+//     totalUsers
+//     totalPhotos
+//   }
+// `
 
-const App = ({ users = [] }) => {
-  return(
-    <div>
-      {users.map(user =>
-        <div key={user.githubLogin}>
-          <img src={user.avatar} alt="" />
-          {user.name}
-        </div>
-      )}
-      <button  onClick={addUser}>Add User</button>
-    </div>
-  )
-}
+// client.query({query})
+//   .then(({ data }) => console.log('data', data))
+//   .then(console.error)
 
-const render = ({ allUsers = [] }) =>
-  ReactDOM.render(
-      <App users={allUsers} />,
-    document.getElementById('root')
-  )
+// console.log('cache', client.extract())
+// client.query({query})
+//   .then(() => console.log('cache', client.extract()))
+//   .catch(console.error)
 
-const addUser = () =>
-  request(url, mutation, {count: 1})
-    .then(requestAndRendar)
-    .catch(console.error)
+// let mutation = `
+//   mutation populate($count: Int!) {
+//     addFakeUsers(count: $count) {
+//       githubLogin
+//       avatar
+//       name
+//     }
+//   }
+// `
 
-const requestAndRendar = () =>
-  request(url, query)
-    .then(render)
-    .catch(console.error)
+// const App = ({ users = [] }) => {
+//   return(
+//     <div>
+//       {users.map(user =>
+//         <div key={user.githubLogin}>
+//           <img src={user.avatar} alt="" />
+//           {user.name}
+//         </div>
+//       )}
+//       <button  onClick={addUser}>Add User</button>
+//     </div>
+//   )
+// }
 
-requestAndRendar()
+// const render = ({ allUsers = [] }) =>
+//   ReactDOM.render(
+//       <App users={allUsers} />,
+//     document.getElementById('root')
+//   )
+
+// const addUser = () =>
+//   request(url, mutation, {count: 1})
+//     .then(requestAndRendar)
+//     .catch(console.error)
+
+// const requestAndRendar = () =>
+//   request(url, query)
+//     .then(render)
+//     .catch(console.error)
+
+// requestAndRendar()
