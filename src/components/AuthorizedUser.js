@@ -1,33 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { withRouter, useHistory } from 'react-router-dom'
-import { Mutation } from 'react-apollo'
-import { gql } from 'apollo-boost'
+import { gql, useMutation } from '@apollo/client'
 import { ROOT_QUERY } from './App'
 
 const AuthorizedUser = () => {
   const [signingIn, setSiginingIn] = useState(false)
   const history = useHistory()
-
   const GITHUB_AUTH_MUTATION = gql`
     mutation githubAuth($code: String!) {
       githubAuth(code: $code) { token }
     }
   `
-
-  const authorizationComplete = (cache, { data }) => {
-    localStorage.setItem('token', data.githuAuth.token)
-    history.replace('/')
-    setSiginingIn(false)
-  }
+  const [authorizeByGithub] = useMutation(
+    GITHUB_AUTH_MUTATION,
+    {
+      update(cache, result) {
+        localStorage.setItem('token', result.data.githubAuth.token)
+        setSiginingIn(false)
+        history.replace('/')
+      },
+      refetchQueries: [ROOT_QUERY]
+    }
+  )
 
   useEffect(() => {
     if(window.location.search.match(/code=/)) {
       setSiginingIn(true)
       const code = window.location.search.replace("?code=", "")
-      githubAuthMutation({varibales: {code}})
-      history.replace('/')
+      authorizeByGithub({ variables: { code } })
     }
-  })
+  }, [authorizeByGithub])
 
   const requestCode = () => {
     const clientID = process.env.REACT_APP_CLIENT_ID
@@ -35,23 +37,12 @@ const AuthorizedUser = () => {
   }
 
   return(
-    <Mutation
-      mutation={GITHUB_AUTH_MUTATION}
-      update={authorizationComplete()}
-      refetchQueries={[{ query: ROOT_QUERY }]}
+    <button
+      onClick={() => requestCode()}
+      disabled={signingIn}
     >
-      {mutation => {
-        githubAuthMutation = mutation
-        return(
-          <button
-            onClick={() => requestCode()}
-            disabled={signingIn}
-          >
-            Sign In with GitHUb
-          </button>
-        )
-      }}
-    </Mutation>
+      Sign In with GitHUb
+    </button>
   )
 }
 

@@ -1,10 +1,9 @@
 import React from 'react'
 import { render } from 'react-dom'
 import App from './components/App'
-import { ApolloProvider } from 'react-apollo'
-import ApolloClient from 'apollo-boost'
+import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client"
 
-const client = new ApolloClient({ uri: 'http://localhost:4000/graphql' })
+const client = new ApolloClient({ uri: 'http://localhost:4000/graphql', cache: new InMemoryCache() })
 
 render(
   <ApolloProvider client={client}>

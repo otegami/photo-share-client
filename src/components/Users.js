@@ -1,36 +1,32 @@
 import React from 'react'
-import { Query, Mutation } from 'react-apollo'
 import { ROOT_QUERY } from './App'
-import { gql } from 'apollo-boost'
+import { gql, useQuery, useMutation } from "@apollo/client"
 
 const Users = () => {
+  const { data, loading, refetch } = useQuery(ROOT_QUERY)
   return(
-    <Query query={ROOT_QUERY}>
-      {({ data, loading, refetch }) => loading ?
-        <p>loading users...</p> :
-        <UserList
-          count={data.totalUsers}
-          users={data.allUsers}
-          refetchUsers={refetch}/>
-      }
-    </Query>
+    loading ?
+      <p>loading users...</p> :
+      <UserList
+        count={data.totalUsers}
+        users={data.allUsers}
+        refetchUsers={refetch}/>
   )
 }
 
 const UserList = ({ count, users, refetchUsers }) => {
+  const [addFakeUser] = useMutation(
+    ADD_FAKE_USERS_MUTATION,
+    {
+      variables: { count: 1 },
+      refetchQueries: [ROOT_QUERY] }
+  )
+
   return(
     <div>
       <p>{count} Users</p>
       <button onClick={() => refetchUsers()}>Refetch Users</button>
-      <Mutation
-        mutation={ADD_FAKE_USERS_MUTATION}
-        variables={{ count: 1 }}
-        refetchQueries={[{ query: ROOT_QUERY }]}
-      >
-        {addFakeUsers =>
-          <button onClick={addFakeUsers}>Add Fake Users</button>
-        }
-      </Mutation>
+      <button onClick={() => addFakeUser()}>Add Fake Users</button>
       <ul>
         {users.map(user =>
           <UserListItem
