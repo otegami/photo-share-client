@@ -4,7 +4,8 @@ import { gql, useQuery, useMutation } from "@apollo/client"
 
 const Users = () => {
   const { data, loading, refetch } = useQuery(ROOT_QUERY)
-  return(
+
+  return(    
     loading ?
       <p>loading users...</p> :
       <UserList

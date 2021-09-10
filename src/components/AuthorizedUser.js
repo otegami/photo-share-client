@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { withRouter, useHistory } from 'react-router-dom'
 import { gql, useMutation } from '@apollo/client'
 import { ROOT_QUERY } from './App'
+import Me from './Me'
 
 const AuthorizedUser = () => {
   const [signingIn, setSiginingIn] = useState(false)
@@ -37,12 +38,12 @@ const AuthorizedUser = () => {
   }
 
   return(
-    <button
-      onClick={() => requestCode()}
-      disabled={signingIn}
-    >
-      Sign In with GitHUb
-    </button>
+    <Me
+      signingIn={signingIn}
+      requestCode={() => requestCode()}
+      // クリック後に画面をリダイレクトしたいな
+      logout={() => localStorage.removeItem('token')}
+    />
   )
 }
 
